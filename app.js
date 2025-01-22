@@ -5,83 +5,64 @@ tg.expand();
 tg.MainButton.textColor = '#FFFFFF';
 tg.MainButton.color = '#2cab37';
 
-let selectedItems = [];
-const itemPrices = { 1: 1000, 2: 2000, 3: 3000, 4: 4000, 5: 5000, 6: 6000 };
+let selectedItems = []; // Список выбранных товаров
+let totalAmount = 0; // Итоговая сумма
 
-let btn1 = document.getElementById("btn1");
-let btn2 = document.getElementById("btn2");
-let btn3 = document.getElementById("btn3");
-let btn4 = document.getElementById("btn4");
-let btn5 = document.getElementById("btn5");
-let btn6 = document.getElementById("btn6");
+// Массив с ценами товаров
+const items = [
+    { id: 1, name: "Товар 1", price: 100000 },
+    { id: 2, name: "Товар 2", price: 150000 },
+    { id: 3, name: "Товар 3", price: 200000 },
+    { id: 4, name: "Товар 4", price: 250000 },
+    { id: 5, name: "Товар 5", price: 300000 },
+    { id: 6, name: "Товар 6", price: 350000 }
+];
 
-function handleButtonClick(itemNumber) {
-    if (selectedItems.includes(itemNumber)) {
-        // Убираем товар из списка, если он уже был выбран
-        selectedItems = selectedItems.filter(i => i !== itemNumber);
-    } else {
-        // Добавляем товар в список
-        selectedItems.push(itemNumber);
-    }
-    updateMainButton();
-}
-
-function calculateTotal() {
-    return selectedItems.reduce((total, item) => total + itemPrices[item], 0);
-}
-
-function updateMainButton() {
+// Функция для обновления суммы
+function updateTotalAmount() {
+    totalAmount = selectedItems.reduce((sum, item) => sum + item.price, 0);
     if (selectedItems.length > 0) {
-        const total = calculateTotal();
-        tg.MainButton.setText(`Выбрано: ${selectedItems.join(", ")} | Сумма: ${total} KZT`);
+        tg.MainButton.setText(`Итого: ${totalAmount} KZT`);
         tg.MainButton.show();
     } else {
         tg.MainButton.hide();
     }
 }
 
-// Привязываем обработчики к кнопкам товаров
-btn1.addEventListener("click", function () {
-    handleButtonClick(1);
-});
-btn2.addEventListener("click", function () {
-    handleButtonClick(2);
-});
-btn3.addEventListener("click", function () {
-    handleButtonClick(3);
-});
-btn4.addEventListener("click", function () {
-    handleButtonClick(4);
-});
-btn5.addEventListener("click", function () {
-    handleButtonClick(5);
-});
-btn6.addEventListener("click", function () {
-    handleButtonClick(6);
-});
+// Функция для обработки клика по кнопкам товаров
+function handleItemClick(itemId) {
+    const item = items.find(i => i.id === itemId);
 
-// Обработка события MainButton
+    if (!item) return;
+
+    // Если товар уже выбран, убираем его, иначе добавляем
+    const index = selectedItems.findIndex(i => i.id === itemId);
+    if (index !== -1) {
+        selectedItems.splice(index, 1); // Удалить товар
+    } else {
+        selectedItems.push(item); // Добавить товар
+    }
+
+    updateTotalAmount(); // Обновить сумму
+}
+
+// Привязка кнопок к обработчику кликов
+document.getElementById("btn1").addEventListener("click", () => handleItemClick(1));
+document.getElementById("btn2").addEventListener("click", () => handleItemClick(2));
+document.getElementById("btn3").addEventListener("click", () => handleItemClick(3));
+document.getElementById("btn4").addEventListener("click", () => handleItemClick(4));
+document.getElementById("btn5").addEventListener("click", () => handleItemClick(5));
+document.getElementById("btn6").addEventListener("click", () => handleItemClick(6));
+
+// Отправка данных в бот
 Telegram.WebApp.onEvent("mainButtonClicked", function () {
-    const total = calculateTotal();
-    tg.sendData(JSON.stringify({ items: selectedItems, total }));
+    tg.sendData(JSON.stringify(selectedItems)); // Отправка выбранных товаров
 });
 
 // Отображение информации о пользователе
 let usercard = document.getElementById("usercard");
+
 let p = document.createElement("p");
+
 p.innerText = `${tg.initDataUnsafe.user.first_name} ${tg.initDataUnsafe.user.last_name}`;
 usercard.appendChild(p);
-
-// Случайный заказ
-let randomOrderBtn = document.getElementById("randomOrder");
-randomOrderBtn.addEventListener("click", function () {
-    let randomItems = [];
-    let allItems = [1, 2, 3, 4, 5, 6];
-    for (let i = 0; i < 3; i++) {
-        let randomIndex = Math.floor(Math.random() * allItems.length);
-        randomItems.push(allItems[randomIndex]);
-        allItems.splice(randomIndex, 1);
-    }
-    selectedItems = randomItems;
-    updateMainButton();
-});
