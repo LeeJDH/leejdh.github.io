@@ -8,12 +8,12 @@ tg.MainButton.color = '#2cab37';
 let cart = []; // Корзина для выбранных товаров
 let totalAmount = 0; // Общая сумма
 const items = [
-    { id: 1, name: "Товар 1", price: 1000 },
-    { id: 2, name: "Товар 2", price: 2000 },
-    { id: 3, name: "Товар 3", price: 3000 },
-    { id: 4, name: "Товар 4", price: 4000 },
-    { id: 5, name: "Товар 5", price: 5000 },
-    { id: 6, name: "Товар 6", price: 6000 },
+    { id: 1, name: "Товар 1", price: 100000},
+    { id: 2, name: "Товар 2", price: 150000 },
+    { id: 3, name: "Товар 3", price: 200000 },
+    { id: 4, name: "Товар 4", price: 250000 },
+    { id: 5, name: "Товар 5", price: 300000 },
+    { id: 6, name: "Товар 6", price: 350000 },
 ];
 
 // Обновление кнопки Telegram
