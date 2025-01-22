@@ -46,6 +46,20 @@ function handleItemClick(itemId) {
     updateTotalAmount(); // Обновить сумму
 }
 
+// Функция для случайного заказа
+function handleRandomOrder() {
+    const randomIndex = Math.floor(Math.random() * items.length);
+    const randomItem = items[randomIndex];
+
+    if (!selectedItems.some(i => i.id === randomItem.id)) {
+        selectedItems.push(randomItem);
+        updateTotalAmount();
+        alert(`Случайный заказ: ${randomItem.name}`);
+    } else {
+        alert(`Случайный заказ: ${randomItem.name} уже выбран`);
+    }
+}
+
 // Привязка кнопок к обработчику кликов
 document.getElementById("btn1").addEventListener("click", () => handleItemClick(1));
 document.getElementById("btn2").addEventListener("click", () => handleItemClick(2));
@@ -53,6 +67,9 @@ document.getElementById("btn3").addEventListener("click", () => handleItemClick(
 document.getElementById("btn4").addEventListener("click", () => handleItemClick(4));
 document.getElementById("btn5").addEventListener("click", () => handleItemClick(5));
 document.getElementById("btn6").addEventListener("click", () => handleItemClick(6));
+
+// Привязка кнопки случайного заказа
+document.getElementById("btnRandom").addEventListener("click", handleRandomOrder);
 
 // Отправка данных в бот
 Telegram.WebApp.onEvent("mainButtonClicked", function () {
