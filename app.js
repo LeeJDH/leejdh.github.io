@@ -1,14 +1,16 @@
 let tg = window.Telegram.WebApp;
 
+// Расширяем WebApp
 tg.expand();
 
+// Настройка главной кнопки Telegram
 tg.MainButton.textColor = '#FFFFFF';
 tg.MainButton.color = '#2cab37';
 
 let selectedItems = []; // Список выбранных товаров
 let totalAmount = 0; // Итоговая сумма
 
-// Массив с ценами товаров
+// Массив с товарами
 const items = [
     { id: 1, name: "Товар 1", price: 100000 },
     { id: 2, name: "Товар 2", price: 150000 },
@@ -18,9 +20,10 @@ const items = [
     { id: 6, name: "Товар 6", price: 350000 }
 ];
 
-// Функция для обновления суммы
+// Обновление итоговой суммы
 function updateTotalAmount() {
     totalAmount = selectedItems.reduce((sum, item) => sum + item.price, 0);
+
     if (selectedItems.length > 0) {
         tg.MainButton.setText(`Итого: ${totalAmount} KZT`);
         tg.MainButton.show();
@@ -29,57 +32,62 @@ function updateTotalAmount() {
     }
 }
 
-// Функция для обработки клика по кнопкам товаров
+// Обработка кликов по товарам
 function handleItemClick(itemId) {
     const item = items.find(i => i.id === itemId);
 
     if (!item) return;
 
-    // Если товар уже выбран, убираем его, иначе добавляем
+    // Проверяем, выбран ли товар
     const index = selectedItems.findIndex(i => i.id === itemId);
+
+    const button = document.getElementById(`btn${itemId}`);
     if (index !== -1) {
-        selectedItems.splice(index, 1); // Удалить товар
+        selectedItems.splice(index, 1); // Убираем товар
+        button.classList.remove("selected"); // Снимаем выделение
     } else {
-        selectedItems.push(item); // Добавить товар
+        selectedItems.push(item); // Добавляем товар
+        button.classList.add("selected"); // Добавляем выделение
     }
 
-    updateTotalAmount(); // Обновить сумму
+    updateTotalAmount(); // Обновляем итог
 }
 
-// Функция для случайного заказа
+// Случайный заказ
 function handleRandomOrder() {
     const randomIndex = Math.floor(Math.random() * items.length);
     const randomItem = items[randomIndex];
 
     if (!selectedItems.some(i => i.id === randomItem.id)) {
         selectedItems.push(randomItem);
+        document.getElementById(`btn${randomItem.id}`).classList.add("selected");
         updateTotalAmount();
-        alert(`Случайный заказ: ${randomItem.name}`);
+        alert(`Случайный заказ добавлен: ${randomItem.name}`);
     } else {
         alert(`Случайный заказ: ${randomItem.name} уже выбран`);
     }
 }
 
-// Привязка кнопок к обработчику кликов
-document.getElementById("btn1").addEventListener("click", () => handleItemClick(1));
-document.getElementById("btn2").addEventListener("click", () => handleItemClick(2));
-document.getElementById("btn3").addEventListener("click", () => handleItemClick(3));
-document.getElementById("btn4").addEventListener("click", () => handleItemClick(4));
-document.getElementById("btn5").addEventListener("click", () => handleItemClick(5));
-document.getElementById("btn6").addEventListener("click", () => handleItemClick(6));
+// Привязка событий к кнопкам товаров
+items.forEach(item => {
+    const button = document.getElementById(`btn${item.id}`);
+    if (button) {
+        button.addEventListener("click", () => handleItemClick(item.id));
+    }
+});
 
 // Привязка кнопки случайного заказа
 document.getElementById("btnRandom").addEventListener("click", handleRandomOrder);
 
-// Отправка данных в бот
+// Отправка данных в Telegram бота
 Telegram.WebApp.onEvent("mainButtonClicked", function () {
-    tg.sendData(JSON.stringify(selectedItems)); // Отправка выбранных товаров
+    tg.sendData(JSON.stringify(selectedItems)); // Отправка данных о выбранных товарах
 });
 
 // Отображение информации о пользователе
-let usercard = document.getElementById("usercard");
-
-let p = document.createElement("p");
-
-p.innerText = `${tg.initDataUnsafe.user.first_name} ${tg.initDataUnsafe.user.last_name}`;
-usercard.appendChild(p);
+const userCard = document.getElementById("usercard");
+if (userCard) {
+    const userInfo = document.createElement("p");
+    userInfo.innerText = `${tg.initDataUnsafe.user.first_name} ${tg.initDataUnsafe.user.last_name}`;
+    userCard.appendChild(userInfo);
+}
